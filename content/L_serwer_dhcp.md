@@ -16,7 +16,7 @@ Otwieramy plik **isc-dhcp-server**, by wpisać swój interfejs sieciowy.
 
 W odpowiednie miejsce wpisujemy nazwe swojego interfejsu sieciowego
 
-![](../photos/L_serwer_dhcp_1.png)
+![](./photos/L_serwer_dhcp_1.png)
 
 ---
 
@@ -26,13 +26,13 @@ Otwieramy plik **dhcpd.conf**, by skonfigurować serwer.
 
 Odkomentowujemy `authoritave;`, włącza to serwer.
 
-![](../photos/L_serwer_dhcp_2.png)
+![](./photos/L_serwer_dhcp_2.png)
 
 --- 
 
 #### Zmieniamy zakres i ustawienia naszego serwera.
 
-![](../photos/L_serwer_dhcp_3.png)
+![](./photos/L_serwer_dhcp_3.png)
 
 * `subnet ADRES_SIECI netmask MASKA`
     * `range 192.168.10.200 192.168.10.220` - zakres rozdawanych **adresów**
@@ -44,7 +44,7 @@ Odkomentowujemy `authoritave;`, włącza to serwer.
 
 #### Ustawienie adresu hosta (jeśli wymagane)
 
-![](../photos/L_serwer_dhcp_4.png)
+![](./photos/L_serwer_dhcp_4.png)
 
 * `host NAZWA` - nadajemy **nazwe hosta**
     * `hardware ethernet ADRES_MAC` - wpisujemy adres MAC hosta

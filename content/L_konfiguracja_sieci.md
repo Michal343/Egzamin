@@ -3,14 +3,14 @@
 ## Sprawdzenie interfejsu
 
 `ip a` - pokazuje wszystkie interfejsy sieciowe
-![](..../photos/konfiguracja_sieci_1.png)
+![](./photos/konfiguracja_sieci_1.png)
 
 ## Edycja pliku netplan
 
 Edytujemy plik netplan za pomocą polecenia:
 `sudo nano /etc/netplan/(TAB)`
 
-![](../photos/konfiguracja_sieci_2.png)
+![](./photos/konfiguracja_sieci_2.png)
 
 
 * `ens18` - nazwa interfejsu wzięta z **ip a**
