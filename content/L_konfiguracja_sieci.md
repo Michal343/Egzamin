@@ -3,7 +3,7 @@
 ## Sprawdzenie interfejsu
 
 `ip a` - pokazuje wszystkie interfejsy sieciowe
-![](/Egzamin/photos/konfiguracja_sieci_1.png)
+![](..../photos/konfiguracja_sieci_1.png)
 
 ## Edycja pliku netplan
 
