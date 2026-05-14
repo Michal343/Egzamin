@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { BookOpen, Monitor, Network, Menu, X, Terminal, Users, ChevronDown, ChevronRight } from 'lucide-react';
+import { BookOpen, Monitor, Network, Menu, X, Terminal, Users, Sun, Moon } from 'lucide-react';
 import remarkGfm from 'remark-gfm';
+import { useLocalStorage } from 'usehooks-ts'
 
-// Nowa struktura danych z kategoriami
+
+
 const categories = [
   {
     name: 'Ubuntu Serwer',
@@ -24,11 +26,12 @@ const categories = [
 ];
 
 const App = () => {
-  // Domyślnie wybieramy pierwszy temat z pierwszej kategorii
   const [activeTopic, setActiveTopic] = useState(categories[0].topics[0]);
   const [content, setContent] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [theme, setTheme] = useLocalStorage('theme', 'light')
 
+  // Efekt do ładowania Markdown
   useEffect(() => {
     const loadMarkdown = async () => {
       try {
@@ -43,13 +46,26 @@ const App = () => {
     loadMarkdown();
   }, [activeTopic]);
 
+  // Efekt do obsługi klas ciemnego motywu w Tailwind
+  useEffect(() => {
+  document.documentElement.classList.toggle('dark', theme === 'dark');
+}, [theme]);
+
+ 
+
+  // Przełączanie trybu ciemnego
+  const toggleDarkMode = () => {
+  setTheme(prev => prev === 'light' ? 'dark' : 'light');
+};
+
+
   return (
-    <div className="min-h-screen bg-slate-50 flex text-slate-900 font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300">
       
       {/* SIDEBAR */}
       <aside className={`
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
-        fixed inset-y-0 left-0 z-50 w-72 bg-slate-900 text-white transition-transform duration-300 ease-in-out md:relative md:translate-x-0
+        fixed inset-y-0 left-0 z-50 w-72 bg-slate-900 dark:bg-black text-white transition-transform duration-300 ease-in-out md:relative md:translate-x-0
       `}>
         <div className="p-6 border-b border-slate-700 flex justify-between items-center">
           <h1 className="text-xl font-bold flex items-center gap-2">
@@ -61,11 +77,9 @@ const App = () => {
         <nav className="p-4 space-y-6 overflow-y-auto h-[calc(100vh-80px)]">
           {categories.map((category) => (
             <div key={category.name} className="space-y-2">
-              {/* Nagłówek Kategorii */}
               <h2 className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 {category.name}
               </h2>
-              
               <div className="space-y-1">
                 {category.topics.map((topic) => (
                   <button
@@ -89,46 +103,57 @@ const App = () => {
 
       {/* MAIN CONTENT */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden">
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center px-6 justify-between shrink-0">
-          <button className="md:hidden" onClick={() => setIsSidebarOpen(true)}>
-            <Menu />
-          </button>
-          <div className="text-sm text-slate-500 truncate">
-            Egzamin INF.02 <span className="mx-2">/</span> 
-            <span className="text-slate-900 font-semibold">{activeTopic.title}</span>
+        <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-6 justify-between shrink-0 transition-colors">
+          <div className="flex items-center gap-4">
+            <button className="md:hidden dark:text-white" onClick={() => setIsSidebarOpen(true)}>
+              <Menu />
+            </button>
+            <div className="text-sm text-slate-500 dark:text-slate-400 truncate">
+              Egzamin INF.02 <span className="mx-2">/</span> 
+              <span className="text-slate-900 dark:text-slate-100 font-semibold">{activeTopic.title}</span>
+            </div>
           </div>
-          <div className="hidden sm:block">
-            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold uppercase">Tryb Nauki</span>
+
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => toggleDarkMode(theme === 'light')}
+              className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-yellow-400 hover:ring-2 ring-blue-400 transition-all cursor-pointer"
+            >
+              {theme=='light' ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+            <div className="hidden sm:block">
+              <span className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-3 py-1 rounded-full text-xs font-bold uppercase">Tryb Nauki</span>
+            </div>
           </div>
         </header>
 
-        <section className="flex-1 overflow-y-auto p-4 md:p-12 bg-slate-50">
-          <article className="max-w-3xl mx-auto bg-white p-6 md:p-12 rounded-2xl shadow-sm border border-slate-200">
-            <div className="prose prose-slate max-w-none">
+        <section className="flex-1 overflow-y-auto p-4 md:p-12 bg-slate-50 dark:bg-slate-950 transition-colors">
+          <article className="max-w-3xl mx-auto bg-white dark:bg-slate-900 p-6 md:p-12 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
+            <div className="prose prose-slate dark:prose-invert max-w-none">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
                   // Nagłówki
-                  h1: ({ node, ...props }) => <h1 className="text-4xl font-black mb-6 text-slate-900 " {...props} />,
-                  h2: ({ node, ...props }) => <h2 className="text-2xl font-bold mt-8 mb-4 text-slate-800 border-b-1 border-gray-300 pb-2" {...props} />,
-                  h3: ({ node, ...props }) => <h3 className="text-xl font-semibold mt-6 mb-2 text-blue-600" {...props} />,
-                  h4: ({ node, ...props }) => <h4 className="text-lg font-medium mt-4 mb-1 text-slate-700" {...props} />,
+                  h1: ({ node, ...props }) => <h1 className="text-4xl font-black mb-6 text-slate-900 dark:text-white" {...props} />,
+                  h2: ({ node, ...props }) => <h2 className="text-2xl font-bold mt-8 mb-4 text-slate-800 dark:text-slate-100 border-b border-slate-300 dark:border-slate-700 pb-2" {...props} />,
+                  h3: ({ node, ...props }) => <h3 className="text-xl font-semibold mt-6 mb-2 text-blue-600 dark:text-blue-400" {...props} />,
+                  h4: ({ node, ...props }) => <h4 className="text-lg font-medium mt-4 mb-1 text-slate-700 dark:text-slate-300" {...props} />,
 
                   // Tekst i listy
-                  p: ({ node, ...props }) => <p className="leading-relaxed mb-4 text-slate-700 text-base" {...props} />,
-                  ul: ({ node, ...props }) => <ul className="list-disc ml-6 mb-4 space-y-2 text-slate-700" {...props} />,
-                  ol: ({ node, ...props }) => <ol className="list-decimal ml-6 mb-4 space-y-2 text-slate-700" {...props} />,
+                  p: ({ node, ...props }) => <p className="leading-relaxed mb-4 text-slate-700 dark:text-slate-300 text-base" {...props} />,
+                  ul: ({ node, ...props }) => <ul className="list-disc ml-6 mb-4 space-y-2 text-slate-700 dark:text-slate-300" {...props} />,
+                  ol: ({ node, ...props }) => <ol className="list-decimal ml-6 mb-4 space-y-2 text-slate-700 dark:text-slate-300" {...props} />,
                   li: ({ node, ...props }) => <li className="pl-1" {...props} />,
 
                   // Kod
                   code: ({ node, inline, className, children, ...props }) => {
-                    const isInline = !className; // react-markdown v9+ oznacza bloki kodu klasą language-xxx
+                    const isInline = !className;
                     return isInline ? (
-                      <code className="bg-slate-100 px-1.5 py-0.5 rounded text-pink-600 font-mono text-sm border border-slate-200" {...props}>
+                      <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-pink-600 dark:text-pink-400 font-mono text-sm border border-slate-200 dark:border-slate-700" {...props}>
                         {children}
                       </code>
                     ) : (
-                      <pre className="bg-slate-100 text-pink-600 p-4 rounded-xl my-6 overflow-x-auto border border-slate-200">
+                      <pre className="bg-slate-100 dark:bg-slate-800 text-pink-600 dark:text-pink-400 p-4 rounded-xl my-6 overflow-x-auto border border-slate-200 dark:border-slate-700">
                         <code className="font-mono text-sm leading-relaxed" {...props}>
                           {children}
                         </code>
@@ -136,27 +161,27 @@ const App = () => {
                     );
                   },
 
-                  // Cytaty (np. ważne ostrzeżenia/uwagi)
+                  // Cytaty
                   blockquote: ({ node, ...props }) => (
-                    <blockquote className="border-l-4 border-blue-500 bg-blue-50 pl-4 py-2 pr-2 italic text-slate-600 my-6 rounded-r-md" {...props} />
+                    <blockquote className="border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 pl-4 py-2 pr-2 italic text-slate-600 dark:text-slate-400 my-6 rounded-r-md" {...props} />
                   ),
 
-                  // Tabele (kluczowe przy porównywaniu parametrów procesorów/pamięci)
+                  // Tabele
                   table: ({ node, ...props }) => (
-                    <div className="overflow-x-auto my-8 shadow-sm border border-slate-200 rounded-lg">
-                      <table className="min-w-full divide-y divide-slate-200" {...props} />
+                    <div className="overflow-x-auto my-8 shadow-sm border border-slate-200 dark:border-slate-800 rounded-lg">
+                      <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800" {...props} />
                     </div>
                   ),
-                  thead: ({ node, ...props }) => <thead className="bg-slate-50" {...props} />,
-                  th: ({ node, ...props }) => <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider" {...props} />,
-                  td: ({ node, ...props }) => <td className="px-4 py-3 text-sm text-slate-600 border-t border-slate-100" {...props} />,
+                  thead: ({ node, ...props }) => <thead className="bg-slate-50 dark:bg-slate-800/50" {...props} />,
+                  th: ({ node, ...props }) => <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider" {...props} />,
+                  td: ({ node, ...props }) => <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300 border-t border-slate-100 dark:border-slate-800" {...props} />,
 
                   // Inne
-                  hr: ({ node, ...props }) => <hr className="my-8 border-t-2 border-slate-100" {...props} />,
-                  a: ({ node, ...props }) => <a className="text-blue-600 hover:text-blue-800 underline decoration-blue-300 underline-offset-4 transition-colors" {...props} />,
-                  img: ({ node, ...props }) => <img className="rounded-xl shadow-md my-8 mx-auto border border-slate-200" {...props} alt={props.alt || "Grafika edukacyjna"} />,
-                  strong: ({ node, ...props }) => <strong className="font-bold text-slate-900" {...props} />,
-                  em: ({ node, ...props }) => <em className="italic text-slate-800" {...props} />,
+                  hr: ({ node, ...props }) => <hr className="my-8 border-t-2 border-slate-100 dark:border-slate-800" {...props} />,
+                  a: ({ node, ...props }) => <a className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline decoration-blue-300 dark:decoration-blue-700 underline-offset-4 transition-colors" {...props} />,
+                  img: ({ node, ...props }) => <img className="rounded-xl shadow-md my-8 mx-auto border border-slate-200 dark:border-slate-700" {...props} alt={props.alt || "Grafika edukacyjna"} />,
+                  strong: ({ node, ...props }) => <strong className="font-bold text-slate-900 dark:text-white" {...props} />,
+                  em: ({ node, ...props }) => <em className="italic text-slate-800 dark:text-slate-200" {...props} />,
                 }}
               >
                 {content}
@@ -166,6 +191,7 @@ const App = () => {
         </section>
       </main>
     </div>
+    
   );
 };
 
