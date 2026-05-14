@@ -37,7 +37,7 @@ const App = () => {
   useEffect(() => {
     const loadMarkdown = async () => {
       try {
-        const response = await fetch(`../content/${activeTopic.id}.md`);
+        const response = await fetch(`./content/${activeTopic.id}.md`);
         if (!response.ok) throw new Error("Nie znaleziono pliku");
         const text = await response.text();
         setContent(text);
