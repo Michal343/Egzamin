@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { BookOpen, Monitor, Network, Menu, X, Terminal, Users, Sun, Moon } from 'lucide-react';
+import { BookOpen, Monitor, Network, Menu, X, Terminal, Users, Sun, Moon, Router  } from 'lucide-react';
 import remarkGfm from 'remark-gfm';
 import { useLocalStorage } from 'usehooks-ts'
 
@@ -10,9 +10,11 @@ const categories = [
   {
     name: 'Ubuntu Serwer',
     topics: [
+      // { id: 'testowy', title: 'Podstawowe Polecenia', icon: <Terminal size={18} /> },
       { id: 'L_podstawowe_polecenia', title: 'Podstawowe Polecenia', icon: <Terminal size={18} /> },
       { id: 'L_uzytkownicy_i_grupy', title: 'Użytkownicy i Grupy', icon: <Users size={18} /> },
       { id: 'L_konfiguracja_sieci', title: 'Konfiguracja Sieci', icon: <Network size={18} /> },
+      { id: 'L_serwer_dhcp', title: 'Serwer DHCP', icon: <Router  size={18} /> },
     ]
   },
   {
