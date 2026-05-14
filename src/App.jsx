@@ -1,47 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { BookOpen, Monitor, Network, HardDrive, Menu, X, FlaskConical, Terminal, Users  } from 'lucide-react';
-import remarkGfm from 'remark-gfm'
+import { BookOpen, Monitor, Network, Menu, X, Terminal, Users, ChevronDown, ChevronRight } from 'lucide-react';
+import remarkGfm from 'remark-gfm';
 
-// Przykładowe dane tematów (Docelowo możesz to trzymać w osobnym pliku JSON)
-const topics = [
-  // { id: 'procesory', title: 'Budowa i rodzaje procesorów', icon: <HardDrive size={20} /> },
-  // { id: 'systemy', title: 'Instalacja systemów operacyjnych', icon: <Monitor size={20} /> },
-  // { id: 'sieci', title: 'Topologie i media transmisyjne', icon: <Network size={20} /> },
-  // { id: 'testowy', title: 'Testowy plik', icon: <FlaskConical size={20} /> },
-  // { id: 'Zarzadzanie_Systemem', title: 'Zarządzanie Systemem', icon: <Terminal  size={20} /> },
-  { id: 'podstawowe_polecenia', title: 'Podstawowe Polecenia', icon: <Terminal  size={20} /> },
-  { id: 'uzytkownicy_i_grupy', title: 'Użytkownicy i Grupy', icon: <Users   size={20} /> },
-  { id: 'konfiguracja_sieci', title: 'Konfiguracja Sieci', icon: <Network   size={20} /> },
+// Nowa struktura danych z kategoriami
+const categories = [
+  {
+    name: 'Ubuntu Serwer',
+    topics: [
+      { id: 'L_podstawowe_polecenia', title: 'Podstawowe Polecenia', icon: <Terminal size={18} /> },
+      { id: 'L_uzytkownicy_i_grupy', title: 'Użytkownicy i Grupy', icon: <Users size={18} /> },
+      { id: 'L_konfiguracja_sieci', title: 'Konfiguracja Sieci', icon: <Network size={18} /> },
+    ]
+  },
+  {
+    name: 'Windows Serwer',
+    topics: [
+      { id: 'active_directory', title: 'Active Directory', icon: <Users size={18} /> },
+      { id: 'dns_windows', title: 'Konfiguracja DNS', icon: <Network size={18} /> },
+      { id: 'zasady_grup', title: 'GPO - Zasady Grup', icon: <Monitor size={18} /> },
+    ]
+  }
 ];
 
 const App = () => {
-  const [activeTopic, setActiveTopic] = useState(topics[0]);
+  // Domyślnie wybieramy pierwszy temat z pierwszej kategorii
+  const [activeTopic, setActiveTopic] = useState(categories[0].topics[0]);
   const [content, setContent] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Symulacja ładowania pliku .md
- useEffect(() => {
-  // 1. Definiujemy funkcję asynchroniczną wewnątrz efektu
-  const loadMarkdown = async () => {
-    try {
-      // Ścieżka do pliku w folderze /public/content/
-      const response = await fetch(`/content/${activeTopic.id}.md`);
-      
-      if (!response.ok) {
-        throw new Error("Nie znaleziono pliku tematu");
+  useEffect(() => {
+    const loadMarkdown = async () => {
+      try {
+        const response = await fetch(`/content/${activeTopic.id}.md`);
+        if (!response.ok) throw new Error("Nie znaleziono pliku");
+        const text = await response.text();
+        setContent(text);
+      } catch (err) {
+        setContent("# Błąd\nNie udało się załadować treści.");
       }
+    };
+    loadMarkdown();
+  }, [activeTopic]);
 
-      const text = await response.text();
-      setContent(text);
-    } catch (err) {
-      console.error("Błąd ładowania pliku:", err);
-      setContent("# Błąd\nNie udało się załadować treści dla tego tematu.");
-    }
-  };
-
-  loadMarkdown();
-}, [activeTopic]); // Efekt odpali się za każdym razem, gdy zmienisz temat
   return (
     <div className="min-h-screen bg-slate-50 flex text-slate-900 font-sans">
       
@@ -57,44 +58,52 @@ const App = () => {
           <button className="md:hidden" onClick={() => setIsSidebarOpen(false)}><X /></button>
         </div>
         
-        <nav className="p-4 space-y-2">
-          {topics.map((topic) => (
-            <button
-              key={topic.id}
-              onClick={() => { setActiveTopic(topic); setIsSidebarOpen(false); }}
-              className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${
-                activeTopic.id === topic.id ? 'bg-blue-600 text-white' : 'hover:bg-slate-800 text-slate-400'
-              }`}
-            >
-              {topic.icon}
-              <span className="text-sm font-medium">{topic.title}</span>
-            </button>
+        <nav className="p-4 space-y-6 overflow-y-auto h-[calc(100vh-80px)]">
+          {categories.map((category) => (
+            <div key={category.name} className="space-y-2">
+              {/* Nagłówek Kategorii */}
+              <h2 className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                {category.name}
+              </h2>
+              
+              <div className="space-y-1">
+                {category.topics.map((topic) => (
+                  <button
+                    key={topic.id}
+                    onClick={() => { setActiveTopic(topic); setIsSidebarOpen(false); }}
+                    className={`w-full flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition-all ${
+                      activeTopic.id === topic.id 
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' 
+                      : 'hover:bg-slate-800 text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    {topic.icon}
+                    <span className="text-sm font-medium">{topic.title}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
           ))}
         </nav>
       </aside>
 
       {/* MAIN CONTENT */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* Top Header */}
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center px-6 justify-between">
+        <header className="h-16 bg-white border-b border-slate-200 flex items-center px-6 justify-between shrink-0">
           <button className="md:hidden" onClick={() => setIsSidebarOpen(true)}>
             <Menu />
           </button>
-          <div className="text-sm text-slate-500">
+          <div className="text-sm text-slate-500 truncate">
             Egzamin INF.02 <span className="mx-2">/</span> 
             <span className="text-slate-900 font-semibold">{activeTopic.title}</span>
           </div>
           <div className="hidden sm:block">
-            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">Tryb Nauki</span>
+            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold uppercase">Tryb Nauki</span>
           </div>
         </header>
 
-        {/* Content Area */}
-       {/* Content Area */}
-        <section className="flex-1 overflow-y-auto p-6 md:p-12">
-          <article className="max-w-3xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
-            
-            {/* TUTAJ ZMIANA: Kontener div zamiast className w ReactMarkdown */}
+        <section className="flex-1 overflow-y-auto p-4 md:p-12 bg-slate-50">
+          <article className="max-w-3xl mx-auto bg-white p-6 md:p-12 rounded-2xl shadow-sm border border-slate-200">
             <div className="prose prose-slate max-w-none">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
@@ -153,7 +162,6 @@ const App = () => {
                 {content}
               </ReactMarkdown>
             </div>
-
           </article>
         </section>
       </main>
