@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { BookOpen, Monitor, Network, Menu, X, Terminal, Users, Sun, Moon, Router  } from 'lucide-react';
+import { BookOpen, Monitor, Network, Menu, X, Terminal, Users, Sun, Moon, Router, ServerCrash, Globe    } from 'lucide-react';
 import remarkGfm from 'remark-gfm';
 import { useLocalStorage } from 'usehooks-ts'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -17,7 +17,8 @@ const categories = [
       { id: 'L_uzytkownicy_i_grupy', title: 'Użytkownicy i Grupy', icon: <Users size={18} /> },
       { id: 'L_konfiguracja_sieci', title: 'Konfiguracja Sieci', icon: <Network size={18} /> },
       { id: 'L_serwer_dhcp', title: 'Serwer DHCP', icon: <Router  size={18} /> },
-      { id: 'L_serwer_dns', title: 'Serwer DNS', icon: <Router  size={18} /> },
+      { id: 'L_serwer_dns', title: 'Serwer DNS', icon: <ServerCrash   size={18} /> },
+      { id: 'L_serwer_www', title: 'Serwer WWW', icon: <Globe    size={18} /> },
     ]
   },
   {
