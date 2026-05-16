@@ -3,7 +3,9 @@ import ReactMarkdown from 'react-markdown';
 import { BookOpen, Monitor, Network, Menu, X, Terminal, Users, Sun, Moon, Router  } from 'lucide-react';
 import remarkGfm from 'remark-gfm';
 import { useLocalStorage } from 'usehooks-ts'
-
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+// Możesz wybrać inny motyw, np. vscDarkPlus (podobny do VS Code), dracula, oneDark itp.
+import { coldarkDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 
 const categories = [
@@ -15,6 +17,7 @@ const categories = [
       { id: 'L_uzytkownicy_i_grupy', title: 'Użytkownicy i Grupy', icon: <Users size={18} /> },
       { id: 'L_konfiguracja_sieci', title: 'Konfiguracja Sieci', icon: <Network size={18} /> },
       { id: 'L_serwer_dhcp', title: 'Serwer DHCP', icon: <Router  size={18} /> },
+      { id: 'L_serwer_dns', title: 'Serwer DNS', icon: <Router  size={18} /> },
     ]
   },
   {
@@ -151,18 +154,28 @@ const App = () => {
                   // Kod
                   code: ({ node, inline, className, children, ...props }) => {
                     const isInline = !className;
+                    
+                    // Wyciągamy język (np. "language-js", "language-nginx"), który markdown przekazuje w className
+                    const match = /language-(\w+)/.exec(className || '');
+
                     return isInline ? (
+                      // Kod inline zostaje prosty, z Twoim różowym kolorem
                       <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-pink-600 dark:text-pink-400 font-mono text-sm border border-slate-200 dark:border-slate-700" {...props}>
                         {children}
                       </code>
                     ) : (
-                      <pre className="bg-slate-100 dark:bg-slate-800 text-pink-600 dark:text-pink-400 p-4 rounded-xl my-6 overflow-x-auto border border-slate-200 dark:border-slate-700">
-                        <code className="font-mono text-sm leading-relaxed" {...props}>
-                          {children}
-                        </code>
-                      </pre>
+                      // Blok kodu używa teraz SyntaxHighlighter
+                      <SyntaxHighlighter
+                        style={coldarkDark}                 // Styl kolorowania
+                        language={match ? match[1] : ''}    // Automatycznie wykryty język (np. javascript, bash)
+                        PreTag="div"                        // Zapobiega domyślnemu renderowaniu dodatkowego <pre> przez highlighter
+                        className="rounded-xl my-6 border border-slate-200 dark:border-slate-700 text-sm"
+                        {...props}
+                      >
+                        {String(children).replace(/\n$/, '')}
+                      </SyntaxHighlighter>
                     );
-                  },
+},
 
                   // Cytaty
                   blockquote: ({ node, ...props }) => (
